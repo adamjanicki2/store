@@ -38,13 +38,18 @@ function makeOps<T>(initialState: T): StoreOperations<T> {
   return { getState, setState, subscribe };
 }
 
-export function createStore<T>(
-  initialState: T,
-  plugin?: Plugin<T>
-): UseStore<T> {
-  const ops = makeOps(initialState);
+type CreateStoreOptions<T> = {
+  init: T;
+  plugins?: readonly Plugin<T>[] | Plugin<T>[];
+};
 
-  plugin?.(ops);
+export function createStore<T>({
+  init,
+  plugins,
+}: CreateStoreOptions<T>): UseStore<T> {
+  const ops = makeOps(init);
+
+  plugins?.forEach((plugin) => plugin(ops));
 
   function useStore() {
     const value = React.useSyncExternalStore(

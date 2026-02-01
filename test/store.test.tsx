@@ -20,7 +20,7 @@ describe("createStore", () => {
     jest.restoreAllMocks();
   });
   it("returns initial state and setter tuple", () => {
-    const useCount = createStore(0);
+    const useCount = createStore({ init: 0 });
 
     function Wrapper() {
       const [count] = useCount();
@@ -33,7 +33,7 @@ describe("createStore", () => {
   });
 
   it("updates state when set is called with a value", () => {
-    const useCount = createStore(0);
+    const useCount = createStore({ init: 0 });
 
     function Wrapper() {
       const [count, setCount] = useCount();
@@ -57,7 +57,7 @@ describe("createStore", () => {
   });
 
   it("updates state when set is called with a callback", () => {
-    const useCount = createStore(0);
+    const useCount = createStore({ init: 0 });
 
     function Wrapper() {
       const [count, setCount] = useCount();
@@ -81,7 +81,7 @@ describe("createStore", () => {
   });
 
   it("does not rerender when setting to the same value", () => {
-    const useCount = createStore(0);
+    const useCount = createStore({ init: 0 });
     const renderSpy = jest.fn();
 
     function Wrapper() {
@@ -120,7 +120,7 @@ describe("createStore", () => {
   });
 
   it("supports multiple components using the same store", () => {
-    const useCount = createStore(0);
+    const useCount = createStore({ init: 0 });
 
     function A() {
       const [count] = useCount();
@@ -156,7 +156,7 @@ describe("createStore", () => {
   });
 
   it("does not update after a component is unmounted", () => {
-    const useCount = createStore(0);
+    const useCount = createStore({ init: 0 });
     const effectSpy = jest.fn();
 
     let setCallback: (n: number) => void;
@@ -188,10 +188,10 @@ describe("createStore", () => {
     const storage = makeMemoryStorage();
     storage.setItem("k", JSON.stringify({ a: 2, b: 3 }));
 
-    const useObj = createStore(
-      { a: 1, b: 1, c: 9 },
-      persist({ key: "k", storage })
-    );
+    const useObj = createStore({
+      init: { a: 1, b: 1, c: 9 },
+      plugins: [persist({ key: "k", storage })],
+    });
 
     function Wrapper() {
       const [value] = useObj();
@@ -215,7 +215,10 @@ describe("createStore", () => {
     const storage = makeMemoryStorage();
     storage.setItem("k", JSON.stringify("dark"));
 
-    const usePref = createStore("system", persist({ key: "k", storage }));
+    const usePref = createStore({
+      init: "system",
+      plugins: [persist({ key: "k", storage })],
+    });
 
     function Wrapper() {
       const [pref] = usePref();
@@ -230,7 +233,10 @@ describe("createStore", () => {
   it("writes to storage on set with a value", () => {
     const storage = makeMemoryStorage();
 
-    const useCount = createStore(0, persist({ key: "count", storage }));
+    const useCount = createStore({
+      init: 0,
+      plugins: [persist({ key: "count", storage })],
+    });
 
     function Wrapper() {
       const [count, setCount] = useCount();
@@ -259,7 +265,10 @@ describe("createStore", () => {
   it("writes to storage on set with a callback", () => {
     const storage = makeMemoryStorage();
 
-    const useCount = createStore(0, persist({ key: "count", storage }));
+    const useCount = createStore({
+      init: 0,
+      plugins: [persist({ key: "count", storage })],
+    });
 
     function Wrapper() {
       const [count, setCount] = useCount();
@@ -299,10 +308,10 @@ describe("createStore", () => {
       }),
     };
 
-    const useCount = createStore(
-      0,
-      persist({ key: "k", storage: faultyStorage })
-    );
+    const useCount = createStore({
+      init: 0,
+      plugins: [persist({ key: "k", storage: faultyStorage })],
+    });
 
     function Wrapper() {
       const [count, setCount] = useCount();
@@ -329,7 +338,10 @@ describe("createStore", () => {
     const storage = makeMemoryStorage();
     storage.setItem("k", "{bad}");
 
-    const useObj = createStore({ a: 1 }, persist({ key: "k", storage }));
+    const useObj = createStore({
+      init: { a: 1 },
+      plugins: [persist({ key: "k", storage })],
+    });
 
     function Wrapper() {
       const [value] = useObj();
@@ -345,7 +357,7 @@ describe("createStore", () => {
     const storage = makeMemoryStorage();
     storage.setItem("k", JSON.stringify(123));
 
-    createStore(0, persist({ key: "k", storage }));
+    createStore({ init: 0, plugins: [persist({ key: "k", storage })] });
     expect(storage.getItem).toHaveBeenCalledTimes(1);
     expect(storage.getItem).toHaveBeenLastCalledWith("k");
   });
@@ -353,7 +365,10 @@ describe("createStore", () => {
   it("does not write to storage when state doesn't change", () => {
     const storage = makeMemoryStorage();
 
-    const useCount = createStore(0, persist({ key: "k", storage }));
+    const useCount = createStore({
+      init: 0,
+      plugins: [persist({ key: "k", storage })],
+    });
 
     function Wrapper() {
       const [count, setCount] = useCount();
