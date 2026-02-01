@@ -1,19 +1,48 @@
 {
-  "name": "npm-skeleton",
-  "description": "Skeleton/template for an NPM package",
-  "private": true,
+  "name": "@adamjanicki/store",
+  "version": "1.0.0",
+  "description": "Utilities and hooks for storing data",
   "type": "module",
-  "workspaces": [
-    "lib",
-    "demo"
+  "main": "./build/index.js",
+  "module": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "sideEffects": false,
+  "author": "Adam Janicki",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adamjanicki2/store.git"
+  },
+  "files": [
+    "build",
+    "LICENSE",
+    "README.md"
   ],
+  "scripts": {
+    "lint": "eslint src test --fix && prettier --write \"src/**/*.{ts,tsx,json,md}\" \"test/**/*.{ts,tsx}\"",
+    "test": "jest --silent",
+    "build": "npm test && eslint src test --max-warnings=0 && tsc",
+    "prepare": "npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.7.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
+    "@types/react": "^18.0.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.26",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-unused-imports": "^4.3.0",
-    "prettier": "^3.7.4",
-    "typescript-eslint": "^8.39.0"
+    "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5",
+    "prettier": "^3.8.1",
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.54.0"
   }
 }

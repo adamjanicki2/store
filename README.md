@@ -1,3 +1,3 @@
-# npm-skeleton
+# store
 
-Skeleton/template for an NPM package
+Utilities and hooks for storing data
