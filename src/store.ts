@@ -1,11 +1,11 @@
 import React from "react";
 
 type NextState<T> = T | ((prev: T) => T);
-type SetState<T, V> = (next: NextState<T>) => V;
+type SetState<T, U> = (next: NextState<T>) => U;
 type GetState<T> = () => T;
 type Subscribe = (listener: () => void) => () => void;
 
-type Ops<T> = {
+type StoreOperations<T> = {
   getState: GetState<T>;
   setState: SetState<T, boolean>;
   subscribe: Subscribe;
@@ -13,9 +13,9 @@ type Ops<T> = {
 
 type UseStore<T> = () => readonly [T, SetState<T, void>];
 
-type Enhancer<T> = (ops: Ops<T>) => void;
+type Plugin<T> = (ops: StoreOperations<T>) => void;
 
-function makeOps<T>(initialState: T): Ops<T> {
+function makeOps<T>(initialState: T): StoreOperations<T> {
   let state = initialState;
   const listeners = new Set<() => void>();
 
@@ -40,11 +40,11 @@ function makeOps<T>(initialState: T): Ops<T> {
 
 export function createStore<T>(
   initialState: T,
-  enhancer?: Enhancer<T>
+  plugin?: Plugin<T>
 ): UseStore<T> {
   const ops = makeOps(initialState);
 
-  enhancer?.(ops);
+  plugin?.(ops);
 
   function useStore() {
     const value = React.useSyncExternalStore(
@@ -67,7 +67,7 @@ type PersistOptions = {
   storage: "local" | "session" | PersistStorage;
 };
 
-export function persist<T>(options: PersistOptions): Enhancer<T> {
+export function persist<T>(options: PersistOptions): Plugin<T> {
   return (ops) => {
     const storage = getStorage(options.storage);
     if (!storage) return;
