@@ -15,8 +15,8 @@ type UseStore<T> = () => readonly [T, SetState<T, void>];
 
 type Plugin<T> = (ops: StoreOperations<T>) => void;
 
-function makeOps<T>(initialState: T): StoreOperations<T> {
-  let state = initialState;
+function makeOps<T>(init: T, isEqual = Object.is): StoreOperations<T> {
+  let state = init;
   const listeners = new Set<() => void>();
 
   const getState: GetState<T> = () => state;
@@ -24,7 +24,7 @@ function makeOps<T>(initialState: T): StoreOperations<T> {
   const setState: SetState<T, boolean> = (next) => {
     const nextState: T =
       typeof next === "function" ? (next as (prev: T) => T)(state) : next;
-    if (Object.is(nextState, state)) return false;
+    if (isEqual(nextState, state)) return false;
     state = nextState;
     listeners.forEach((listener) => listener());
     return true;
@@ -41,13 +41,15 @@ function makeOps<T>(initialState: T): StoreOperations<T> {
 type CreateStoreOptions<T> = {
   init: T;
   plugins?: readonly Plugin<T>[] | Plugin<T>[];
+  isEqual?: (a: T, b: T) => boolean;
 };
 
 export function createStore<T>({
   init,
   plugins,
+  isEqual,
 }: CreateStoreOptions<T>): UseStore<T> {
-  const ops = makeOps(init);
+  const ops = makeOps(init, isEqual);
 
   plugins?.forEach((plugin) => plugin(ops));
 

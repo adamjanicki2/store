@@ -119,6 +119,64 @@ describe("createStore", () => {
     expect(renderSpy).toHaveBeenLastCalledWith(1);
   });
 
+  it("uses custom equality function", () => {
+    const useStore = createStore({
+      init: { a: 1, b: 2, c: 3 },
+      isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
+    });
+    const renderSpy = jest.fn();
+
+    function Wrapper() {
+      const [store, setStore] = useStore();
+
+      React.useEffect(() => {
+        renderSpy(store);
+      }, [store]);
+
+      return (
+        <button onClick={() => setStore({ a: 1, b: 2, c: 3 })}>same</button>
+      );
+    }
+
+    render(<Wrapper />);
+
+    expect(renderSpy).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      screen.getByRole("button", { name: "same" }).click();
+    });
+
+    expect(renderSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("updates when isEqual returns false", () => {
+    const useCount = createStore({
+      init: 0,
+      isEqual: () => false,
+    });
+    const renderSpy = jest.fn();
+
+    function Wrapper() {
+      const [count, setCount] = useCount();
+
+      React.useEffect(() => {
+        renderSpy(count);
+      }, [count]);
+
+      return <button onClick={() => setCount(0)}>same</button>;
+    }
+
+    render(<Wrapper />);
+
+    expect(renderSpy).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      screen.getByRole("button", { name: "same" }).click();
+    });
+
+    expect(renderSpy).toHaveBeenCalledTimes(2);
+  });
+
   it("supports multiple components using the same store", () => {
     const useCount = createStore({ init: 0 });
 
