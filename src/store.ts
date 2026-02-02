@@ -1,4 +1,4 @@
-import React from "react";
+import { useSyncExternalStore } from "react";
 
 type NextState<T> = T | ((prev: T) => T);
 type SetState<T, U> = (next: NextState<T>) => U;
@@ -38,11 +38,22 @@ function makeOps<T>(init: T): StoreOperations<T> {
   return { getState, setState, subscribe };
 }
 
+/** Options for creating a store hook */
 type CreateStoreOptions<T> = {
+  /** Value to initialize the state to */
   init: T;
+  /** Plugins that can extend store behavior, e.g. storage option */
   plugins?: readonly Plugin<T>[] | Plugin<T>[];
 };
 
+/**
+ * Creates a hook backed by a shared store.
+ * The returned hook can be used across multiple components to read and update
+ * the same state instance.
+ *
+ * @param options create store options
+ * @returns a hook that returns the current state and a setter function
+ */
 export function createStore<T>({
   init,
   plugins,
@@ -52,7 +63,7 @@ export function createStore<T>({
   plugins?.forEach((plugin) => plugin(ops));
 
   function useStore() {
-    const value = React.useSyncExternalStore(
+    const value = useSyncExternalStore(
       ops.subscribe,
       ops.getState,
       ops.getState
@@ -67,11 +78,21 @@ export function createStore<T>({
 }
 
 type PersistStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+
+/** Options for the persist plugin function */
 type PersistOptions = {
+  /** Key to use to persist this state in local/session storage */
   key: string;
+  /** Storage method to use; accepts local/session storage or a custom option */
   storage: "local" | "session" | PersistStorage;
 };
 
+/**
+ * Creates a plugin that serializes/deserializes state to/from storage
+ *
+ * @param options including the storage key and type
+ * @returns store plugin option
+ */
 export function persist<T>(options: PersistOptions): Plugin<T> {
   return (ops) => {
     const storage = getStorage(options.storage);
