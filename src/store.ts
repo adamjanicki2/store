@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 type NextState<T> = T | ((prev: T) => T);
 type SetState<T, U> = (next: NextState<T>) => U;
@@ -68,9 +68,9 @@ export function createStore<T>({
       ops.getState,
       ops.getState
     );
-    const setState = (next: NextState<T>) => {
+    const setState = useCallback((next: NextState<T>) => {
       ops.setState(next);
-    };
+    }, []);
     return [value, setState] as const;
   }
 
