@@ -19,7 +19,7 @@ describe("createStore", () => {
   beforeEach(() => {
     jest.restoreAllMocks();
   });
-  it("returns initial state and setter tuple", () => {
+  it("returns initial state and setter", () => {
     const useCount = createStore({ init: 0 });
 
     function Wrapper() {
@@ -161,9 +161,12 @@ describe("createStore", () => {
 
     let setCallback: (n: number) => void;
 
-    function Wrapper() {
+    function Wrapper({ onSet }: { onSet: (fn: (n: number) => void) => void }) {
       const [count, setCount] = useCount();
-      setCallback = setCount;
+
+      React.useEffect(() => {
+        onSet(setCount);
+      }, [onSet, setCount]);
 
       React.useEffect(() => {
         effectSpy(count);
@@ -172,7 +175,7 @@ describe("createStore", () => {
       return <div data-testid="count">{count}</div>;
     }
 
-    const { unmount } = render(<Wrapper />);
+    const { unmount } = render(<Wrapper onSet={(fn) => (setCallback = fn)} />);
 
     expect(effectSpy).toHaveBeenCalledTimes(1);
     expect(effectSpy).toHaveBeenLastCalledWith(0);
@@ -401,7 +404,7 @@ describe("createStore", () => {
         });
       }).not.toThrow();
     } finally {
-      (globalThis as any).window = originalWindow;
+      globalThis.window = originalWindow;
     }
   });
 });

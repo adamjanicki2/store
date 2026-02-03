@@ -21,7 +21,7 @@
   "scripts": {
     "lint": "eslint src test --fix && prettier --write \"src/**/*.{ts,tsx,json,md}\" \"test/**/*.{ts,tsx}\"",
     "test": "jest --silent",
-    "build": "npm test && eslint src test --max-warnings=0 && tsc",
+    "build": "npm test && eslint src test --max-warnings=0 && python3 build.py",
     "prepare": "npm run build"
   },
   "peerDependencies": {
@@ -33,6 +33,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
     "@types/react": "^18.0.0",
+    "esbuild": "^0.27.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.26",
