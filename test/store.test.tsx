@@ -388,4 +388,20 @@ describe("createStore", () => {
 
     expect(storage.setItem).toHaveBeenCalledTimes(0);
   });
+
+  it("does not throw when window is unavailable during persist init", () => {
+    const originalWindow = globalThis.window;
+    delete (globalThis as any).window;
+
+    try {
+      expect(() => {
+        createStore({
+          init: { a: 1 },
+          plugins: [persist({ key: "k", storage: "local" })],
+        });
+      }).not.toThrow();
+    } finally {
+      (globalThis as any).window = originalWindow;
+    }
+  });
 });

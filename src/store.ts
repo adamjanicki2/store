@@ -135,6 +135,6 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 
 function getStorage(storage: PersistOptions["storage"]): PersistStorage | null {
   if (typeof storage !== "string") return storage;
-  if (!window) return null;
+  if (typeof window === "undefined") return null;
   return storage === "local" ? window.localStorage : window.sessionStorage;
 }
