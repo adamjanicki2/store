@@ -7,7 +7,7 @@ export default {
   moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
   setupFilesAfterEnv: ["<rootDir>/test/jest.setup.ts"],
   moduleNameMapper: {
-    "^npm-skeleton/(.*)$": "<rootDir>/src/$1",
-    "^npm-skeleton$": "<rootDir>/src/index.ts",
+    "^store/(.*)$": "<rootDir>/src/$1",
+    "^store$": "<rootDir>/src/index.ts",
   },
 };
